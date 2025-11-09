@@ -6,6 +6,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,7 +21,7 @@ jobs:
             artifact_name: node-16-build
           - version: 18
             artifact_name: node-18-build
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -32,13 +33,14 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.version }}
-        cache: 'npm'
+        # REMOVE the cache line entirely
     
     - name: Generate build artifact
       run: |
         echo "Build output for Node.js ${{ matrix.version }}" > output.txt
         echo "Timestamp: $(date)" >> output.txt
         echo "Commit: ${{ github.sha }}" >> output.txt
+        echo "Node.js version: ${{ matrix.version }}" >> output.txt
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4
