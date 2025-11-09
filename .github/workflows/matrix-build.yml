@@ -1,0 +1,48 @@
+# .github/workflows/matrix-build.yml
+name: Matrix Build with Artifacts
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [14, 16, 18]
+        include:
+          - version: 14
+            artifact_name: node-14-build
+          - version: 16
+            artifact_name: node-16-build
+          - version: 18
+            artifact_name: node-18-build
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: matrix-1981f93
+      run: echo "Building for Node.js version ${{ matrix.version }}"
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.version }}
+        cache: 'npm'
+    
+    - name: Generate build artifact
+      run: |
+        echo "Build output for Node.js ${{ matrix.version }}" > output.txt
+        echo "Timestamp: $(date)" >> output.txt
+        echo "Commit: ${{ github.sha }}" >> output.txt
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-1981f93-${{ matrix.artifact_name }}
+        path: output.txt
+        retention-days: 30
